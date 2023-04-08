@@ -16,4 +16,7 @@ appId: org.reactjs.native.example.flutterWaveTest
 - inputText: "password"
 - hideKeyboard
 - tapOn: "login"
+- assertVisible:
+    text: "addItem"
+    enabled: true
 - tapOn: "addItem"
