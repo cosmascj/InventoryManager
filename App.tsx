@@ -1,5 +1,5 @@
 import React from 'react';
-import {StatusBar} from 'expo-status-bar';
+// import {StatusBar} from 'expo-status-bar';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
 const App = () => {
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#fff" />
+      {/* <StatusBar backgroundColor="#fff" /> */}
       <QueryClientProvider client={queryClient}>
         <NavigationContainer>
           <AuthContextProvider>

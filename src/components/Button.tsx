@@ -33,10 +33,12 @@ type ButtonProps = {
   borderColor: string;
   backgroundColor: string;
   color: string;
+  textID: string;
 };
 const Button = (Props: ButtonProps) => {
   return (
     <TouchableOpacity
+      testID={Props.textID}
       style={{
         height: 45,
         backgroundColor: Props.outlined

@@ -27,18 +27,6 @@ const Login: React.FC<LoginScreenProps> = () => {
     email: email,
   };
 
-  //   const updateStore = async () => {
-  //     const existingProducts = await AsyncStorage.getItem('test1');
-  //     // let newProduct = JSON.parse(existingProducts);
-  //     await AsyncStorage.mergeItem('test1', JSON.stringify(value))
-  //       .then(() => {
-  //         console.log('It was saved successfully');
-  //       })
-  //       .catch(err => {
-  //         console.log('There was an error saving the product', err);
-  //       });
-  //   };
-
   const storeUser = async () => {
     setIsLoading(true);
     try {
@@ -64,21 +52,23 @@ const Login: React.FC<LoginScreenProps> = () => {
           style={styles.input}
           onChangeText={email => setEmail(email)}
           placeholder="Enter any email"
+          testID="email"
         />
         <TextInput
           value={password}
           style={styles.input}
           onChangeText={password => setPassword(password)}
           placeholder="Password"
+          testID="password"
         />
       </View>
       <View style={{padding: 20}}>
         <Button
+          textID="login"
           text="LOGIN"
           disabled={email === '' || password === ''}
           loading={isLoading}
           backgroundColor={primaryBlue}
-          //@ts-ignore
           onPress={() => {
             storeUser();
           }}

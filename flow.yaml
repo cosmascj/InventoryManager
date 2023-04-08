@@ -1,0 +1,19 @@
+# flow.yaml
+# App ID is the application ID
+appId: org.reactjs.native.example.flutterWaveTest
+---
+- launchApp
+- assertVisible:
+    text: "email"
+    enabled: true
+- assertVisible:
+    text: "password"
+    enabled: true
+- tapOn: "email"
+- inputText: "flutterwave@gmail.com"
+- hideKeyboard
+- tapOn: "password"
+- inputText: "password"
+- hideKeyboard
+- tapOn: "login"
+- tapOn: "addItem"

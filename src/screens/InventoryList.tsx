@@ -10,7 +10,6 @@ import {
   TextInput,
   Text,
   FlatList,
-  ScrollView,
   Dimensions,
   Alert,
 } from 'react-native';
@@ -35,6 +34,7 @@ const iconStyle = {
   width: Dimensions.get('window').width,
   height: Dimensions.get('window').height / 5.9,
 };
+
 const InventoryList = () => {
   const {logout, email} = useContext(AuthContext);
   const STORAGE_KEY = `${email}_InventoryItem`;
@@ -47,13 +47,12 @@ const InventoryList = () => {
   const [itemDescription, setItemDescription] = useState('');
   const [uniqueId, setUniqueId] = useState(uuid.v4());
   const [deleteID, setDeleteId] = useState('');
+  const [editID, setEditID] = useState('');
   const [asyncData, setAsyncData] = useState({});
   const refectKeys = () => {
     const inventroyID = uuid.v4();
     setUniqueId(inventroyID);
-    console.log('');
   };
-  let productLimit = [...Array(2).keys()];
   const clearForm = () => {
     setItemDescription('');
     setItemName('');
@@ -63,7 +62,6 @@ const InventoryList = () => {
       setModalVisible(false);
       setEditModalVisible(false);
     }, 200);
-    // getInventory();
     refectKeys();
   };
   const handleSetEditData = (
@@ -92,7 +90,6 @@ const InventoryList = () => {
   };
 
   const updateStore = async () => {
-    // const itemId = uniqueId;
     const newItem = {
       uniqueId,
       itemDescription,
@@ -116,7 +113,10 @@ const InventoryList = () => {
       console.log('There was an error saving the product', error);
     }
   };
-  const handleDeleteInventory = async (productId: string) => {
+  const handleDeleteInventory = async (
+    productId: string,
+    isEditing: Boolean,
+  ) => {
     const newItem = {
       uniqueId,
       itemDescription,
@@ -130,7 +130,7 @@ const InventoryList = () => {
       try {
         const existingData = await AsyncStorage.getItem(STORAGE_KEY);
         if (existingData) {
-          const newData = JSON.parse(existingData);
+          // const newData = JSON.parse(existingData);
           const filteredData = JSON.parse(existingData).filter(
             (obj: {uniqueId: string}) => obj.uniqueId !== productId,
           );
@@ -141,7 +141,8 @@ const InventoryList = () => {
           await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([data]));
           console.log('New data saved successfully.');
         }
-        clearForm();
+
+        isEditing ? console.log('editing') : clearForm();
       } catch (error) {
         console.log('There was an error saving the product', error);
       }
@@ -155,8 +156,6 @@ const InventoryList = () => {
       try {
         const storedItems = await AsyncStorage.getItem(STORAGE_KEY);
         const parsedItems = JSON.parse(storedItems);
-        const itemIdToRetrieve = '456';
-        const retrievedItem = parsedItems[itemIdToRetrieve];
         console.log('inventory', parsedItems);
         setAsyncData(parsedItems);
         return parsedItems;
@@ -168,7 +167,7 @@ const InventoryList = () => {
     getInventory();
   }, [uniqueId, email, STORAGE_KEY]);
   const FLATLISTDATA = asyncData;
-  const editInventory = async (productId: string) => {
+  const openEditInventoryModal = async (productId: string) => {
     try {
       const storedItems = await AsyncStorage.getItem(STORAGE_KEY);
       const parsedItems = JSON.parse(storedItems);
@@ -191,6 +190,39 @@ const InventoryList = () => {
       Alert.alert('something went wrong');
     }
   };
+  const handleEditInventoryData = async () => {
+    const newItem = {
+      uniqueId: editID,
+      itemDescription,
+      itemName,
+      itemPrice,
+      itemStockNumber,
+    };
+    items[editID] = newItem;
+
+    if (editID) {
+      try {
+        const existingData = await AsyncStorage.getItem(STORAGE_KEY);
+        if (existingData) {
+          const filteredData = JSON.parse(existingData).filter(
+            (obj: {uniqueId: string}) => obj.uniqueId !== editID,
+          );
+          console.log(filteredData, 'ppp');
+          const newData = filteredData.concat(newItem);
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+          console.log('Existing data updated successfully.');
+        } else {
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([data]));
+          console.log('New data saved successfully.');
+        }
+
+        clearForm();
+      } catch (error) {
+        console.log('There was an error saving the product', error);
+      }
+    }
+  };
+
   const warningAlert = () =>
     Alert.alert('You are about to delete this product permanaetly', '', [
       {
@@ -201,7 +233,7 @@ const InventoryList = () => {
       {
         text: 'OK',
         onPress: () => {
-          handleDeleteInventory(deleteID);
+          handleDeleteInventory(deleteID, false);
         },
       },
     ]);
@@ -209,36 +241,31 @@ const InventoryList = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
+          testID="addItem"
           onPress={() => {
             setModalVisible(true);
-            // multiget();
           }}
           style={styles.cardButton}>
           <AddIcon />
           <Text style={styles.text}>ADD ITEM</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => logout()} style={styles.cardButton}>
+        <TouchableOpacity
+          testID="logout"
+          onPress={() => logout()}
+          style={styles.cardButton}>
           <Logout />
           <Text style={{...styles.text, color: '#FF0000'}}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
-      {/* <ScrollView>
-        {FLATLISTDATA.map((i, e) => (
-          <InventoryData
-          name={i.itemName}
-           />
-        ))}
-      </ScrollView> */}
       <FlatList
         data={FLATLISTDATA}
-        keyExtractor={(item, index) => item?.uniqueId}
+        keyExtractor={(item, _index) => item?.uniqueId}
         renderItem={({item}) => (
           <InventoryData
             onPress={() => {
-              editInventory(item?.uniqueId);
+              openEditInventoryModal(item?.uniqueId);
               setDeleteId(item?.uniqueId);
-              // handleDeleteInventory(item.uniqueId);
-              // setEditModalVisible(true);
+              setEditID(item?.uniqueId);
             }}
             name={item.itemName}
             price={item.itemPrice}
@@ -342,7 +369,7 @@ const InventoryList = () => {
                 backgroundColor={primaryBlue}
                 text="EDIT ITEM"
                 onPress={() => {
-                  updateStore();
+                  handleEditInventoryData();
                 }}
               />
               <Button
