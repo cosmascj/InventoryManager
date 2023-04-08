@@ -64,16 +64,19 @@ const Login: React.FC<LoginScreenProps> = () => {
           style={styles.input}
           onChangeText={email => setEmail(email)}
           placeholder="Enter any email"
+          testID="email"
         />
         <TextInput
           value={password}
           style={styles.input}
           onChangeText={password => setPassword(password)}
           placeholder="Password"
+          testID="password"
         />
       </View>
       <View style={{padding: 20}}>
         <Button
+          textID="login"
           text="LOGIN"
           disabled={email === '' || password === ''}
           loading={isLoading}

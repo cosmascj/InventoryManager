@@ -1,0 +1,10 @@
+# flow.yaml
+# App ID is the application ID
+appId: com.flutterwavetest
+---
+- launchApp
+- tapOn: "email"
+- inputText: "flutterwave@gmail.com"
+- tapOn: "password"
+- inputText: "password"
+- tapOn: "login"

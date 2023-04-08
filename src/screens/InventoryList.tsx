@@ -47,11 +47,11 @@ const InventoryList = () => {
   const [itemDescription, setItemDescription] = useState('');
   const [uniqueId, setUniqueId] = useState(uuid.v4());
   const [deleteID, setDeleteId] = useState('');
+  const [editID, setEditID] = useState('');
   const [asyncData, setAsyncData] = useState({});
   const refectKeys = () => {
     const inventroyID = uuid.v4();
     setUniqueId(inventroyID);
-    console.log('');
   };
   let productLimit = [...Array(2).keys()];
   const clearForm = () => {
@@ -116,7 +116,10 @@ const InventoryList = () => {
       console.log('There was an error saving the product', error);
     }
   };
-  const handleDeleteInventory = async (productId: string) => {
+  const handleDeleteInventory = async (
+    productId: string,
+    isEditing: Boolean,
+  ) => {
     const newItem = {
       uniqueId,
       itemDescription,
@@ -141,7 +144,8 @@ const InventoryList = () => {
           await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([data]));
           console.log('New data saved successfully.');
         }
-        clearForm();
+
+        isEditing ? console.log('editing') : clearForm();
       } catch (error) {
         console.log('There was an error saving the product', error);
       }
@@ -155,8 +159,6 @@ const InventoryList = () => {
       try {
         const storedItems = await AsyncStorage.getItem(STORAGE_KEY);
         const parsedItems = JSON.parse(storedItems);
-        const itemIdToRetrieve = '456';
-        const retrievedItem = parsedItems[itemIdToRetrieve];
         console.log('inventory', parsedItems);
         setAsyncData(parsedItems);
         return parsedItems;
@@ -168,7 +170,7 @@ const InventoryList = () => {
     getInventory();
   }, [uniqueId, email, STORAGE_KEY]);
   const FLATLISTDATA = asyncData;
-  const editInventory = async (productId: string) => {
+  const openEditInventoryModal = async (productId: string) => {
     try {
       const storedItems = await AsyncStorage.getItem(STORAGE_KEY);
       const parsedItems = JSON.parse(storedItems);
@@ -201,7 +203,7 @@ const InventoryList = () => {
       {
         text: 'OK',
         onPress: () => {
-          handleDeleteInventory(deleteID);
+          handleDeleteInventory(deleteID, false);
         },
       },
     ]);
@@ -222,20 +224,13 @@ const InventoryList = () => {
           <Text style={{...styles.text, color: '#FF0000'}}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
-      {/* <ScrollView>
-        {FLATLISTDATA.map((i, e) => (
-          <InventoryData
-          name={i.itemName}
-           />
-        ))}
-      </ScrollView> */}
       <FlatList
         data={FLATLISTDATA}
         keyExtractor={(item, index) => item?.uniqueId}
         renderItem={({item}) => (
           <InventoryData
             onPress={() => {
-              editInventory(item?.uniqueId);
+              openEditInventoryModal(item?.uniqueId);
               setDeleteId(item?.uniqueId);
               // handleDeleteInventory(item.uniqueId);
               // setEditModalVisible(true);
