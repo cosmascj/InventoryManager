@@ -2,6 +2,7 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../types';
 import InventoryList from '../screens/InventoryList';
+import Login from '../screens/Login';
 const MainNavigator = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
 

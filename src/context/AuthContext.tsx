@@ -23,8 +23,9 @@ const AuthContextProvider = ({children}: LayoutProps) => {
     setUserEmail('');
 
     AsyncStorage.multiRemove(['email', 'password']);
+    // AsyncStorage.clear();
   };
-  const setAuthEmail = async (email = '') => {
+  const setAuthEmail = async (email: string) => {
     // setUserData();
     setUserEmail(email);
     AsyncStorage.setItem('email', email);

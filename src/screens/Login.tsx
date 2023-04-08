@@ -1,37 +1,65 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-native/no-inline-styles */
+
 import React, {useState, useContext} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
   KeyboardAvoidingView,
   TextInput,
-  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../types';
 import {borderGrey, primaryBlue} from '../constants/colors';
 import {AuthContext} from '../context/AuthContext';
-import uuid from 'react-native-uuid';
-// const a = uuid.v4
-console.log(uuid.v4(), 'gg');
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Button from '../components/Button';
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
-const Login: React.FC<LoginScreenProps> = ({navigation}) => {
+const Login: React.FC<LoginScreenProps> = () => {
   //@ts-ignore
   const {setAuthEmail} = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const value = {
+    email: email,
+  };
 
-  //   const SaveData = () => {
-  //     AsyncStorage.setItem('firstName', email);
-  //     AsyncStorage.setItem('LastName', password);
+  //   const updateStore = async () => {
+  //     const existingProducts = await AsyncStorage.getItem('test1');
+  //     // let newProduct = JSON.parse(existingProducts);
+  //     await AsyncStorage.mergeItem('test1', JSON.stringify(value))
+  //       .then(() => {
+  //         console.log('It was saved successfully');
+  //       })
+  //       .catch(err => {
+  //         console.log('There was an error saving the product', err);
+  //       });
   //   };
+
+  const storeUser = async () => {
+    setIsLoading(true);
+    try {
+      await AsyncStorage.setItem(email, JSON.stringify(value));
+      console.log('It was saved successfully');
+      setTimeout(() => {
+        setAuthEmail(email);
+        setIsLoading(false);
+      }, 500);
+    } catch (error) {
+      setIsLoading(false);
+      Alert.alert('Something wenth wrong');
+      console.log(error);
+    }
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.wrapper}>
         <TextInput
-          // defaultValue={status}
+          autoCapitalize="none"
           value={email}
           style={styles.input}
           onChangeText={email => setEmail(email)}
@@ -45,20 +73,17 @@ const Login: React.FC<LoginScreenProps> = ({navigation}) => {
         />
       </View>
       <View style={{padding: 20}}>
-        <TouchableOpacity
-          activeOpacity={0.5}
+        <Button
+          text="LOGIN"
+          disabled={email === '' || password === ''}
+          loading={isLoading}
+          backgroundColor={primaryBlue}
+          //@ts-ignore
           onPress={() => {
-            // console.log(e, 'pp')
-            setAuthEmail(email);
-            navigation.navigate('InventoryList');
+            storeUser();
           }}
-          style={styles.button}>
-          <View style={{padding: 10, justifyContent: 'center'}}>
-            <Text style={{textAlign: 'center', fontWeight: 'bold'}}>
-              PROCEED
-            </Text>
-          </View>
-        </TouchableOpacity>
+          textStyle={styles.textStyle}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -81,12 +106,12 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     padding: 20,
-    marginTop: '40%',
+    marginTop: '50%',
   },
   button: {
     width: '100%',
     height: 40,
-    backgroundColor: primaryBlue,
     borderRadius: 5,
   },
+  textStyle: {},
 });
