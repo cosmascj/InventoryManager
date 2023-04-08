@@ -35,6 +35,7 @@ const iconStyle = {
   width: Dimensions.get('window').width,
   height: Dimensions.get('window').height / 5.9,
 };
+
 const InventoryList = () => {
   const {logout, email} = useContext(AuthContext);
   const STORAGE_KEY = `${email}_InventoryItem`;
@@ -133,7 +134,7 @@ const InventoryList = () => {
       try {
         const existingData = await AsyncStorage.getItem(STORAGE_KEY);
         if (existingData) {
-          const newData = JSON.parse(existingData);
+          // const newData = JSON.parse(existingData);
           const filteredData = JSON.parse(existingData).filter(
             (obj: {uniqueId: string}) => obj.uniqueId !== productId,
           );
@@ -193,6 +194,40 @@ const InventoryList = () => {
       Alert.alert('something went wrong');
     }
   };
+  const handleEditInventoryData = async () => {
+    const newItem = {
+      uniqueId: editID,
+      itemDescription,
+      itemName,
+      itemPrice,
+      itemStockNumber,
+    };
+    items[editID] = newItem;
+
+    if (editID) {
+      try {
+        const existingData = await AsyncStorage.getItem(STORAGE_KEY);
+        if (existingData) {
+          const filteredData = JSON.parse(existingData).filter(
+            (obj: {uniqueId: string}) => obj.uniqueId !== editID,
+          );
+          console.log(filteredData, 'ppp');
+          const newData = filteredData.concat(newItem);
+          // console.log(newData, '{');
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+          console.log('Existing data updated successfully.');
+        } else {
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([data]));
+          console.log('New data saved successfully.');
+        }
+
+        clearForm();
+      } catch (error) {
+        console.log('There was an error saving the product', error);
+      }
+    }
+  };
+
   const warningAlert = () =>
     Alert.alert('You are about to delete this product permanaetly', '', [
       {
@@ -232,8 +267,7 @@ const InventoryList = () => {
             onPress={() => {
               openEditInventoryModal(item?.uniqueId);
               setDeleteId(item?.uniqueId);
-              // handleDeleteInventory(item.uniqueId);
-              // setEditModalVisible(true);
+              setEditID(item?.uniqueId);
             }}
             name={item.itemName}
             price={item.itemPrice}
@@ -337,7 +371,7 @@ const InventoryList = () => {
                 backgroundColor={primaryBlue}
                 text="EDIT ITEM"
                 onPress={() => {
-                  updateStore();
+                  handleEditInventoryData();
                 }}
               />
               <Button
