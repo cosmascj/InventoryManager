@@ -10,7 +10,6 @@ import {
   TextInput,
   Text,
   FlatList,
-  ScrollView,
   Dimensions,
   Alert,
 } from 'react-native';
@@ -54,7 +53,6 @@ const InventoryList = () => {
     const inventroyID = uuid.v4();
     setUniqueId(inventroyID);
   };
-  let productLimit = [...Array(2).keys()];
   const clearForm = () => {
     setItemDescription('');
     setItemName('');
@@ -64,7 +62,6 @@ const InventoryList = () => {
       setModalVisible(false);
       setEditModalVisible(false);
     }, 200);
-    // getInventory();
     refectKeys();
   };
   const handleSetEditData = (
@@ -93,7 +90,6 @@ const InventoryList = () => {
   };
 
   const updateStore = async () => {
-    // const itemId = uniqueId;
     const newItem = {
       uniqueId,
       itemDescription,
@@ -213,7 +209,6 @@ const InventoryList = () => {
           );
           console.log(filteredData, 'ppp');
           const newData = filteredData.concat(newItem);
-          // console.log(newData, '{');
           await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
           console.log('Existing data updated successfully.');
         } else {
@@ -246,22 +241,25 @@ const InventoryList = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
+          testID="addItem"
           onPress={() => {
             setModalVisible(true);
-            // multiget();
           }}
           style={styles.cardButton}>
           <AddIcon />
           <Text style={styles.text}>ADD ITEM</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => logout()} style={styles.cardButton}>
+        <TouchableOpacity
+          testID="logout"
+          onPress={() => logout()}
+          style={styles.cardButton}>
           <Logout />
           <Text style={{...styles.text, color: '#FF0000'}}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
       <FlatList
         data={FLATLISTDATA}
-        keyExtractor={(item, index) => item?.uniqueId}
+        keyExtractor={(item, _index) => item?.uniqueId}
         renderItem={({item}) => (
           <InventoryData
             onPress={() => {
